@@ -15,7 +15,7 @@ Record = namedtuple("Record",
  "sc_status", # HTTP Response code
  "s_action", # how retrieved (cache, etc)
  "cs_method",
- "rs_content_type", # rsponse Content-Type
+ "rs_content_type", # response Content-Type
  "cs_uri_scheme", 
  "cs_host", # Request Host: header
  "cs_uri_port",
@@ -27,6 +27,8 @@ Record = namedtuple("Record",
  "sc_bytes",
  "cs_bytes",
  "x_virus_id"])
+
+Record.__str__ = lambda self: " ".join(self)
 
 dash_or_any = "-|\w+"
 ip_address = "\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" #good enough
@@ -76,7 +78,21 @@ regexes = [
 record_regex = " ".join("({})".format(r) for r in regexes)
 record_re = re.compile(record_regex)
 
-def parse(s):
+def slow_parse(s):
+    """a slow and more accurate parser"""
     m = record_re.match(s)
-    return Record(*m.groups()) if m else s
+    return Record(*m.groups()) if m else None
+
     
+x = ["(\S+)"]*25
+x[20] = '((?:".*?")|.)' # user-agent
+cheap_regex = " +".join(x)
+cheap_re = re.compile(cheap_regex)
+
+def parse(s):
+    """parse a single line"""
+    m = cheap_re.match(s)
+    return Record(*m.groups()) if m else None
+
+def iterparse(s):
+    return (Record(*m.groups()) for m in cheap_re.finditer(s))
