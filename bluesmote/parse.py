@@ -31,6 +31,19 @@ Record = namedtuple("Record",
 dash_or_any = "-|\w+"
 ip_address = "\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" #good enough
 
+rfc3986_uri = """(?:(?:[^:/?#]+):)?(?://(?:[^/?#]*))?(?:[^?#]*)(?:\?(?:[^#]*))?(?:#(?:.*))?"""
+rfc3986_scheme = """[^:/?#]+"""
+rfc3986_host = """[^/?#]*"""
+rfc3986_path = """[^?#]*"""
+rfc3986_query = """\?(?:[^#]*)"""
+
+#rfc3986_uri = """(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?"""
+#rfc3986_scheme = """([^:/?#]+)"""
+#rfc3986_host = """([^/?#]*)"""
+#rfc3986_path = """([^?#]*)"""
+#rfc3986_query = """(\?([^#]*))"""
+
+
 regexes = [
     "2011-\d\d-\d\d", #date
     "\d\d:\d\d:\d\d", #time
@@ -42,16 +55,16 @@ regexes = [
     dash_or_any, #x_exception_id
     "[A-Z]+", #sc_filter_result
     '"\w+"', #cs_categories
-    "[^ ]+ ", #cs_referer XXX need proper URI regex!
+    rfc3986_uri, #cs_referer
     "\d\d\d", #sc_status
     "[A-Z_]+", #s_action
     "\w+", #cs_method
-    "[-\w/+;%]+", #rs_content_type - dash when DENIED
-    "\w+", #cs_uri_scheme
-    "[\w.]+", #cs_host
+    "[-\w/+;%=]+", #rs_content_type - dash when DENIED XXX better regex?
+    rfc3986_scheme, #cs_uri_scheme
+    rfc3986_host, #cs_host
     "\d+", #cs_uri_port 
-    "[-_./\w]+", #cs_uri_path XXX need proper path regex
-    "[-_?&=\w]+", #cs_uri_query
+    rfc3986_path, #cs_uri_path
+    rfc3986_query, #cs_uri_query
     "\w+", #cs_uri_extension
     '".+"', #cs_user_agent
     ip_address, #s_ip
