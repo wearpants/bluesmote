@@ -85,8 +85,9 @@ def slow_parse(s):
 
     
 x = ["(\S+)"]*25
-x[20] = '((?:".*?")|.)' # user-agent
-cheap_regex = " +".join(x)
+x[9] = "(\S+) " # cs_referrer has an extra trailing space
+x[20] = '((?:".*?")|-)' # user-agent
+cheap_regex = " ".join(x)
 cheap_re = re.compile(cheap_regex)
 
 def parse(s):
