@@ -5,10 +5,13 @@ def chunk(iterable, size):
     if isinstance(iterable, (list, tuple)):
         # XXX islice does the wrong thing
         raise NotImplementedError
-    x = islice(iterable, 0, size)
+    
+    # XXX need to manifest to detect end of underlying iterator, it seems
+    x = tuple(islice(iterable, 0, size))
     while x:
         yield x
-        x = islice(iterable, 0, size)
+        x = tuple(islice(iterable, 0, size))
+        
 
 def stringify(it):
     """call str() on each element of it"""
