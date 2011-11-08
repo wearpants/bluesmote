@@ -6,7 +6,7 @@ import sys
 
 intern("OBSERVED")
 def filt(it):
-    results = (r for r in it if r.sc_filter_result != "OBSERVED")
+    return (r for r in it if r.sc_filter_result != "OBSERVED")
     
 
 def main(input, output):
