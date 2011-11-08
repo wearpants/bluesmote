@@ -21,3 +21,5 @@ def exhaust(it):
     """call an iterable to exhaustion"""
     for i in it:
         pass
+
+identity = lambda x: x
