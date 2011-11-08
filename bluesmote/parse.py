@@ -14,7 +14,7 @@ Record = namedtuple("Record",
  "cs_referer", # Referrer header
  "sc_status", # HTTP Response code
  "s_action", # how retrieved (cache, etc)
- "cs_method",
+ "cs_method", # request method - GET, POST, etc.
  "rs_content_type", # response Content-Type
  "cs_uri_scheme", 
  "cs_host", # Request Host: header
@@ -28,8 +28,10 @@ Record = namedtuple("Record",
  "cs_bytes",
  "x_virus_id"])
 
-Record.__str__ = lambda self: " ".join(self)
+Record.__str__ = lambda self: "%s\r\n"%(" ".join(self))
 
+## IGNORE THIS
+#####################
 dash_or_any = "-|\w+"
 ip_address = "\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" #good enough
 
@@ -77,6 +79,7 @@ regexes = [
 
 record_regex = " ".join("({})".format(r) for r in regexes)
 record_re = re.compile(record_regex)
+############################################################
 
 def slow_parse(s):
     """a slow and more accurate parser"""
@@ -85,7 +88,7 @@ def slow_parse(s):
 
     
 x = ["(\S+)"]*25
-x[9] = "(\S+) " # cs_referrer has an extra trailing space
+x[9] = "(\S+) ?" # cs_referrer has an extra trailing space (optional, b/c our output doesn't)
 x[20] = '((?:".*?")|-)' # user-agent
 cheap_regex = " ".join(x)+r'''\r\n'''
 cheap_re = re.compile(cheap_regex)
