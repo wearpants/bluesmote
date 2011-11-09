@@ -11,10 +11,10 @@ def filt(it):
 def mapper(it):
     return util.stringify(filt(it))
 
-def main(input, output):
+def main(input, output, num_workers):
+    fnames = reader.smart_find_logs(input)        
     with open(output, 'wb') as outfile:
-        fnames = ['SG_main__420722212535.log.gz', 'SG_main__420723084209.log.gz']
-        pipeline.pool(fnames, mapper, util.identity, outfile.writelines, 2)
+        pipeline.pool(fnames, mapper, util.identity, outfile.writelines, num_workers)
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], int(sys.argv[3]))

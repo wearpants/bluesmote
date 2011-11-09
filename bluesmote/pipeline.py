@@ -31,11 +31,10 @@ def pool(fnames, mapper, local_reducer, global_reducer, workers):
     for i, g in enumerate(groups):
         print i, sum(x[1] for x in g)/(1024*1024.0)
     
-    workers = [_worker(mapper, local_reducer, g[0], q) for g in groups]
+    workers = [_worker(mapper, local_reducer, [x[0] for x in g], q) for g in groups]
     for w in workers:
         w.daemon = True
         w.start()
-    
     
     print "starting"
     dones = 0

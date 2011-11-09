@@ -21,7 +21,6 @@ def make_counts():
         "cs_uri_extension": Counter(),
     }
 
-
 def dump_counts(counts, path):
     for field, counter in counts.iteritems():
         with open(os.path.join(path, field+'.csv'), 'w') as f:
@@ -41,12 +40,12 @@ def local_reducer(it):
             counter[getattr(r, field)] += 1
     return local_counts
         
-def main(input, output):
+def main(input, output, num_workers):
     fnames = reader.smart_find_logs(input)
     
-    pipeline.pool(fnames, util.identity, local_reducer, global_reducer, 2)
+    pipeline.pool(fnames, util.identity, local_reducer, global_reducer, num_workers)
         
     dump_counts(global_counts, output)
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], int(sys.argv[3]))
