@@ -1,6 +1,6 @@
 from itertools import chain, imap
 
-from bluesmote.util import chunk
+from .util import chunk
 
 from . import reader, parse
 
@@ -26,7 +26,12 @@ def _work(mapper, local_reducer, fnames, q):
 def pool(fnames, mapper, local_reducer, global_reducer, workers):
     q = multiprocessing.Queue(100)
     
-    workers = [_worker(mapper, local_reducer, [fnames[i]], q) for i in xrange(workers)]
+    groups = reader.group_logs(fnames, workers)
+    print "Starting with groups"
+    for i, g in enumerate(groups):
+        print i, sum(x[1] for x in g)/(1024*1024.0)
+    
+    workers = [_worker(mapper, local_reducer, g[0], q) for g in groups]
     for w in workers:
         w.daemon = True
         w.start()

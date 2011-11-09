@@ -23,7 +23,7 @@ Record = namedtuple("Record",
  "cs_uri_query",
  "cs_uri_extension", # file extension
  "cs_user_agent",
- "s_ip", # IP of proxy
+ "s_ip", # IP of proxy OR destination IP
  "sc_bytes",
  "cs_bytes",
  "x_virus_id"])

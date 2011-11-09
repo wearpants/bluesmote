@@ -42,7 +42,7 @@ def local_reducer(it):
     return local_counts
         
 def main(input, output):
-    fnames = ['SG_main__420722212535.log.gz', 'SG_main__420723084209.log.gz']
+    fnames = reader.smart_find_logs(input)
     
     pipeline.pool(fnames, util.identity, local_reducer, global_reducer, 2)
         

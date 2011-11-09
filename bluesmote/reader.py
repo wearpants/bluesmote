@@ -2,6 +2,8 @@ import zlib
 import parse
 import os
 
+from .util import knapsackize
+
 def find_logs(root=None):
     root = root if root is not None else os.getcwd()
     for path, dirs, files in os.walk(root):
@@ -16,6 +18,10 @@ def smart_find_logs(path):
     else:
         return [path]
 
+def group_logs(l, N):
+    return knapsackize([(i, os.path.getsize(i)) for i in l], N)
+    
+    
 BLOCKSIZE=16384
 
 def read_blocks(f):
