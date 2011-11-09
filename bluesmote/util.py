@@ -53,3 +53,32 @@ def knapsackize(l, N):
         smallest().append(x)
 
     return out
+
+class rollover(object):
+    
+    def __init__(self, path, max_lines=1e6):
+        self.path = path
+        self.max_lines = max_lines
+        self.file_ = None
+        self.count = 0
+        self.ext = -1
+        
+        self.rollover()
+    
+    def writelines(self, lines):
+        ret = self.file_.writelines(lines)
+        self.count += len(lines)
+        if self.count > self.max_lines:
+            self.rollover()
+        return ret
+    
+    def rollover(self):
+        if self.file_ is not None:
+            self.file_.close()
+        
+        self.count = 0 
+        self.ext += 1
+        
+        self.file_ = open(self.path+'.'+str(self.ext), 'wb', 16384)
+        
+        
