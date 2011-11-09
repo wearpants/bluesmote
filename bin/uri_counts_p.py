@@ -10,16 +10,15 @@ from collections import defaultdict, OrderedDict, Counter
 import urlparse
 import string
 import re
+import sys
 
 def make_counts():
     return {
-        "domain": Counter(),
-        "domain_base": Counter(),
         "domain_parts": Counter(),
-        "raw_path": Counter(),
-        "raw_query": Counter(),
-        "path": Counter(),
-        "query": Counter(),
+        #"raw_path": Counter(),
+        #"raw_query": Counter(),
+        #"path": Counter(),
+        #"query": Counter(),
         "query_parts": Counter(),
         "path_parts": Counter(),
         "path_query_parts": Counter(),
@@ -42,8 +41,9 @@ def local_reducer(it):
     local_counts = make_counts()
     for d in it:
         for field, l in d.iteritems():
-            c = local_counts[field]
+            c = local_counts[field]              
             for i in l:
+                if i is None: continue
                 c[i] += 1
     return local_counts
 
@@ -51,25 +51,33 @@ def mapper(it):
     return (doit(r) for r in it)
 
 split_re = re.compile("["+string.punctuation+"]")
+ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 
 def doit(r):
-    domain_parts = split_re.split(r.cs_host)    
-    domain_base = ".".join(r.cs_host.rsplit('.', 2)[-2:])
+    if r.cs_host == '-' or ip_re.match(r.cs_host):
+        domain_parts = []
+        domain_base = None        
+    else:
+        domain_parts = split_re.split(r.cs_host)    
+        domain_base = ".".join(r.cs_host.rsplit('.', 2)[-2:])
      
     path = urlparse.unquote(r.cs_uri_path)
     path_parts = split_re.split(path)
-    query = urlparse.unquote(r.cs_uri_query)
-    query_parts = split_re.split(query)
     
+    if r.cs_uri_query != '-':
+        query = urlparse.unquote(r.cs_uri_query)
+        query_parts = split_re.split(query)
+    else:
+        query = None
+        query_parts = []
     
     return {
-        "domain": [r.cs_host],
-        "domain_base": [domain_base],
         "domain_parts": domain_parts,
-        "raw_path": [r.cs_uri_path],
-        "raw_query": [r.cs_uri_query[1:]],
-        "path": [path],
-        "query": query,
+        # XXX worried this may blow up memory
+        #"raw_path": [r.cs_uri_path],
+        #"raw_query": [r.cs_uri_query[1:]],
+        #"path": [path],
+        #"query": [query],
         "path_parts": path_parts,
         "query_parts": query_parts,
         "path_query_parts": path_parts + query_parts,

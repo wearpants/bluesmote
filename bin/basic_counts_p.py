@@ -6,6 +6,7 @@ import sys
 import os
 import operator
 import csv
+import re
 from collections import defaultdict, OrderedDict, Counter
 
 def make_counts():
@@ -20,6 +21,7 @@ def make_counts():
         "cs_host": Counter(),
         "cs_uri_port": Counter(),
         "cs_uri_extension": Counter(),
+        "domain_base": Counter(),
     }
 
 def dump_counts(counts, path):
@@ -34,11 +36,20 @@ def global_reducer(partial_counts):
     for name, counter in global_counts.iteritems():
         counter.update(partial_counts[name])
 
+ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
+        
 def local_reducer(it):
     local_counts = make_counts()
     for r in it:
         for field, counter in local_counts.iteritems():
-            counter[getattr(r, field)] += 1
+            if field != 'domain_base':
+                counter[getattr(r, field)] += 1
+            else:
+                if ip_re.match(r.cs_host):
+                    counter["<IP>"] +=1
+                else:
+                    counter[".".join(r.cs_host.rsplit('.', 2)[-2:])] +=1
+                    
     return local_counts
         
 def main(input, output, num_workers):
