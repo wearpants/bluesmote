@@ -10,6 +10,7 @@ from collections import defaultdict, OrderedDict, Counter
 
 def make_counts():
     return {
+        "date": Counter(),
         "x_exception_id": Counter(),
         "sc_filter_result": Counter(),
         "sc_status": Counter(),
