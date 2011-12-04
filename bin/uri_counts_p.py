@@ -51,21 +51,36 @@ def mapper(it):
     return (doit(r) for r in it)
 
 split_re = re.compile("["+string.punctuation+"]")
+
+def split(s):
+    return split_re.split(s) 
+
 ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 
+def is_ip(s):
+    return ip_re.match(s) is not None
+
+num_dot=set(str(i) for i in xrange(10))
+num_dot.add('.')
+
+def is_ip2(s):
+    return not set(s) - num_dot
+
 def doit(r):
-    if r.cs_host == '-' or ip_re.match(r.cs_host):
+    if r.cs_host == '-' or is_ip2(r.cs_host):
         domain_parts = []
         domain_base = None        
     else:
         domain_parts = split_re.split(r.cs_host)    
         domain_base = ".".join(r.cs_host.rsplit('.', 2)[-2:])
      
-    path = urlparse.unquote(r.cs_uri_path)
+    #path = urlparse.unquote(r.cs_uri_path)
+    path = r.cs_uri_path
     path_parts = split_re.split(path)
     
     if r.cs_uri_query != '-':
-        query = urlparse.unquote(r.cs_uri_query)
+        #query = urlparse.unquote(r.cs_uri_query)
+        query = r.cs_uri_query
         query_parts = split_re.split(query)
     else:
         query = None
@@ -87,7 +102,7 @@ def doit(r):
 def main(input, output, num_workers):
     fnames = reader.smart_find_logs(input)
     
-    pipeline.pool(fnames, mapper, local_reducer, global_reducer, num_workers)
+    pipeline.fakepool(fnames, mapper, local_reducer, global_reducer, num_workers)
     dump_counts(global_counts, output)
 
 if __name__ == '__main__':

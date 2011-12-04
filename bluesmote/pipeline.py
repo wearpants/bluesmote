@@ -47,3 +47,9 @@ def pool(fnames, mapper, local_reducer, global_reducer, workers):
     
     for w in workers:
         w.terminate()
+
+def fakepool(fnames, mapper, local_reducer, global_reducer, workers):
+    for fname in fnames:
+        with open(fname, 'rb') as f:
+            for c in chunk(inline(f, mapper), 16384):
+                global_reducer(local_reducer(c))
