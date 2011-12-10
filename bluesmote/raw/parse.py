@@ -4,10 +4,10 @@ import gzip
 import os
 from itertools import * 
 import operator
-from ..util import chunk, stringify
+from bluesmote.util import chunk, stringify
 
-from ..record import Record
-assert len(Record._fields == 27)
+from bluesmote.record import Record
+assert len(Record._fields) == 27
 
 # some knobs
 compression_factor = 5.5
@@ -48,7 +48,7 @@ def iter_rawlines(path):
             #if 0: assert isinstance(f, gzip.GzipFile)
             i = 0
             for i, l in enumerate(f.readlines(read_blocksize), i):
-                yield "%s %d %s"%(fname, i, l)
+                yield "%s %d %s"%(fname, i, l) # needs to be ~basename(fname), not abspath
 
 def iter_records(path):
     return imap(parse, iter_rawlines(path))
