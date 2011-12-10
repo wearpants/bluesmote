@@ -4,6 +4,7 @@ import gzip
 import os
 from itertools import * 
 import operator
+from ..util import chunk, stringify
 
 from ..record import Record
 assert len(Record._fields == 27)
@@ -59,27 +60,6 @@ def writefiles(inpath, outpath):
         fname = os.path.join(outpath, 'block-%(08d).log.gz'%i)    
         with gzip.open(fname, 'wb') as f:
             f.writelines(stringify(lines))
-            
-def chunk(iterable, size):
-    """return items from iterable in chunks of size items"""
-    if isinstance(iterable, (list, tuple)):
-        # XXX islice does the wrong thing
-        raise NotImplementedError
-    
-    # XXX need to manifest to detect end of underlying iterator, it seems
-    x = tuple(islice(iterable, 0, size))
-    while x:
-        yield x
-        x = tuple(islice(iterable, 0, size))
-        
-def stringify(it):
-    """call str() on each element of it"""
-    return imap(str, it)
-
-def exhaust(it):
-    """call an iterable to exhaustion"""
-    for i in it:
-        pass
 
 if __name__ == '__main__':
     writefiles(sys.argv[1], sys.argv[2])
