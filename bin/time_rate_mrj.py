@@ -4,7 +4,7 @@
 from mrjob.job import MRJob
 from mrjob.protocol import RawValueProtocol
 
-import bluesomete.parse2
+from bluesmote.record import Record
 import re
 
 ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
@@ -12,9 +12,8 @@ ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 class DomainCounter(MRJob):
     
     def mapper(self, key, line):
-        r = bluesomete.parse2.parse(line)
-        if r is not None:
-            yield (r.date, r.time[:-4]+'0:00'), r.sc_filter_result
+        r = Record.parse(line)
+        if r: yield (r.date, r.time[:-4]+'0:00'), r.sc_filter_result
             
     def reducer(self, dt, result):
         yes = no = total = 0

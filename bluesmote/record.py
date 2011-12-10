@@ -29,5 +29,13 @@ Record = namedtuple("Record",
  "cs_bytes",
  "x_virus_id"])
 
-Record.__str__ = lambda self: "%s\n"%("\t".join(self))
-Record.parse = lambda s: Record(*s.rstrip().split('\t'))
+Record.__str__ = lambda self: "%s\n"%("\t".join(self)) 
+
+@staticmethod    
+def parse(s):
+    try:
+        return Record(*s.rstrip().split('\t'))
+    except:
+        return None
+
+Record.parse = parse
