@@ -6,9 +6,9 @@ import os
 from itertools import * 
 import operator
 from collections import namedtuple
-from bluesmote.util import chunk, stringify
+from .util import chunk, stringify
 
-from bluesmote.record import Record
+from .record import Record
 assert len(Record._fields) == 27
 
 RawRecord = namedtuple("RawRecord", Record._fields[2:])

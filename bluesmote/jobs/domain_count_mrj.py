@@ -3,7 +3,7 @@
 
 from mrjob.job import MRJob
 
-import bluesomete.parse2
+from bluesmote.record import Record
 import re
 
 ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
@@ -11,11 +11,14 @@ ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 class DomainCounter(MRJob):
     
     def mapper(self, key, line):
-        r = bluesomete.parse2.parse(line)
+        r = Record.parse(line)
         if r is not None:
+            yield "<TOTAL>", 1
             if ip_re.match(r.cs_host):
+                yield "<IP>", 1
                 yield r.cs_host, 1
             else:
+                yield "<HOST>", 1
                 yield ".".join(r.cs_host.rsplit('.', 2)[-2:]), 1
             
     def reducer(self, domain, occurrences):

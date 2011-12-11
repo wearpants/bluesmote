@@ -2,14 +2,10 @@
 """playing around w/ MRJob"""
 
 from mrjob.job import MRJob
-from mrjob.protocol import RawValueProtocol
-
 from bluesmote.record import Record
 import re
 
-ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
-
-class DomainCounter(MRJob):
+class TimeRate(MRJob):
     
     def mapper(self, key, line):
         r = Record.parse(line)
@@ -29,4 +25,4 @@ class DomainCounter(MRJob):
         yield "%s %s"%tuple(dt), no/(total*1.0)
             
 if __name__ == '__main__':
-    DomainCounter.run()
+    TimeRate.run()
