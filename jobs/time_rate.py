@@ -9,7 +9,7 @@ class TimeRate(MRJob):
     
     @Record.wrap
     def mapper(self, _, r):
-        # XXX add dailies
+        yield (r.date, ), r.sc_filter_result
         yield (r.date, r.time[:-4]+'0:00'), r.sc_filter_result
             
     def combiner(self, dt, result):
@@ -30,8 +30,10 @@ class TimeRate(MRJob):
             yes += y
             no += n
             total += t
-            
-        yield "%s %s"%tuple(dt), no/float(total)
+        
+        rate = no/float(total)        
+        key = "%s %s"%tuple(dt) if len(dt) == 2 else dt[0]
+        yield key, rate
             
 if __name__ == '__main__':
     TimeRate.run()
