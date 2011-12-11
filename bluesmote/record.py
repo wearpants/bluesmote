@@ -1,4 +1,5 @@
 from collections import namedtuple
+from functools import wraps
 
 Record = namedtuple("Record",
 ["filename",
@@ -39,3 +40,14 @@ def parse(s):
         return None
 
 Record.parse = parse
+
+@staticmethod
+def wrap(f):
+    @wraps(f)
+    def wrapped(self, _, line):
+        r = Record.parse(line)
+        if r is not None:
+            for i in f(self, _, r): yield i
+    return wrapped
+
+Record.wrap = wrap

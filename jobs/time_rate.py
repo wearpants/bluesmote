@@ -7,9 +7,10 @@ import re
 
 class TimeRate(MRJob):
     
-    def mapper(self, key, line):
-        r = Record.parse(line)
-        if r: yield (r.date, r.time[:-4]+'0:00'), r.sc_filter_result
+    @Record.wrap
+    def mapper(self, _, r):
+        # XXX add dailies
+        yield (r.date, r.time[:-4]+'0:00'), r.sc_filter_result
             
     def combiner(self, dt, result):
         yes = no = total = 0
