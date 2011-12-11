@@ -19,7 +19,7 @@ class DomainRate(MRJob):
                 yield ".".join(r.cs_host.rsplit('.', 2)[-2:]), r.sc_filter_result
                 yield "<HOST>", r.sc_filter_result
                 
-    def reducer(self, domain, result):
+    def combiner(self, domain, result):
         yes = no = total = 0
         for r in result:
             total +=1
@@ -29,7 +29,15 @@ class DomainRate(MRJob):
                 no += 1
             else:
                 self.increment_counter("unknown_sc_filter_result", r)
+        yield domain, (yes, no, total)
                 
+    def reducer(self, domain, counts):
+        yes = no = total = 0
+        for y, n, t in counts:
+            yes += y
+            no += n
+            total += t
+        
         yield domain, no/float(total)
             
 if __name__ == '__main__':

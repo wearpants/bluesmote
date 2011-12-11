@@ -20,7 +20,10 @@ class DomainCounter(MRJob):
             else:
                 yield "<HOST>", 1
                 yield ".".join(r.cs_host.rsplit('.', 2)[-2:]), 1
-            
+    
+    def combiner(self, domain, occurrences):
+        yield domain, sum(occurrences)
+                
     def reducer(self, domain, occurrences):
         yield domain, sum(occurrences)
             
