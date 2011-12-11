@@ -34,7 +34,7 @@ Record.__str__ = lambda self: "%s\n"%("\t".join(self))
 @staticmethod    
 def parse(s):
     try:
-        return Record(*s.rstrip().split('\t'))
+        return Record._make(s.rstrip().split('\t'))
     except:
         return None
 
