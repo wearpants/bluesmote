@@ -41,7 +41,7 @@ def parse(s):
 def find_logs(root=None):
     root = root if root is not None else os.getcwd()
     for path, dirs, files in os.walk(root):
-        for filename in (os.path.abspath(os.path.join(path, filename)) for filename in files
+        for filename in (os.path.join(path, filename) for filename in files
                          if filename.endswith('.log.gz')):
             yield filename
 
