@@ -1,7 +1,9 @@
-import sys
-from collections import deque
-from collections import namedtuple
 from functools import wraps
+
+try:
+    from collections import namedtuple
+except ImportError:
+    from bluesmote.compat import namedtuple
 
 Record = namedtuple("Record",
 ["filename",
