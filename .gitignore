@@ -1,3 +1,5 @@
+output/
 data/
 *.wpr
+*.wpu
 *.pyc
