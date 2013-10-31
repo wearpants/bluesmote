@@ -22,7 +22,7 @@ Record = namedtuple("Record",
  "s_action", # how retrieved (cache, etc)
  "cs_method", # request method - GET, POST, etc.
  "rs_content_type", # response Content-Type
- "cs_uri_scheme", 
+ "cs_uri_scheme",
  "cs_host", # Request Host: header
  "cs_uri_port",
  "cs_uri_path",
@@ -30,13 +30,13 @@ Record = namedtuple("Record",
  "cs_uri_extension", # file extension
  "cs_user_agent",
  "s_ip", # IP of proxy OR destination IP
- "sc_bytes",
- "cs_bytes",
+ "sc_bytes", # inbound bytes: internet -> proxy -> client
+ "cs_bytes", # outbound bytes: client -> proxy -> internet
  "x_virus_id"])
 
-Record.__str__ = lambda self: "%s\n"%("\t".join(self)) 
+Record.__str__ = lambda self: "%s\n"%("\t".join(self))
 
-@staticmethod    
+@staticmethod
 def parse(s):
     try:
         return Record._make(s.rstrip().split('\t'))
