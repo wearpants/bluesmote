@@ -2,7 +2,7 @@ from bluesmote import jsontab
 import numpy as np
 
 dtype = np.dtype([('timestamp', 'datetime64[s]'),
-                  ('domain', 'S100'),
+                  ('domain', 'S128'),
                   ('accessed', np.uint32),
                   ('blocked', np.uint32),
                   ('outbound', np.uint64),
