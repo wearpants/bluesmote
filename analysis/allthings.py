@@ -1,20 +1,18 @@
 from bluesmote import jsontab
+import os.path
+import itertools
 import numpy as np
 
 dtype = np.dtype([('timestamp', 'datetime64[s]'),
                   ('domain', 'S128'),
                   ('accessed', np.uint32),
                   ('blocked', np.uint32),
-                  ('outbound', np.uint64),
-                  ('inbound', np.uint64)])
+                  ('inbound', np.uint64),
+                  ('outbound', np.uint64)])
 
 def load(dirname):
-    """load numpy data from jsontab files"""
-    it = ((k[:20],
-           np.string_(k[21:]),
-           v[0],
-           v[1],
-           v[2],
-           v[3])
-          for k, v in jsontab.iterload_dir(dirname))
-    return np.fromiter(it, dtype = dtype)
+    files = [os.path.join(dirname, f) for f in os.listdir(dirname)]
+    lines = itertools.chain(*(open(f) for f in files))
+    raw  = (l.rstrip().split('\t') for l in lines)
+    fields = ((ts, np.string_(d), a, b, i, o) for ts, d, a, b, i, o in raw)
+    return np.fromiter(fields, dtype)
