@@ -5,6 +5,7 @@ from mrjob.job import MRJob
 from mrjob.protocol import RawValueProtocol, PickleProtocol
 from bluesmote.record import Record
 import re
+from itertools import imap, chain
 
 ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 
@@ -23,9 +24,9 @@ class AllThings(MRJob):
         value = (r.sc_filter_result, int(r.sc_bytes), int(r.cs_bytes))
 
         if ip_re.match(r.cs_host):
-            yield "%s\t%s"%(isodate, r.cs_host), value
+            yield (isodate, r.cs_host), value
         else:
-            yield "%s\t%s"%(isodate, ".".join(r.cs_host.rsplit('.', 2)[-2:])), value
+            yield (isodate, ".".join(r.cs_host.rsplit('.', 2)[-2:])), value
 
     def combiner(self, key, value):
         accessed = blocked = in_bytes = out_bytes = 0
@@ -54,7 +55,7 @@ class AllThings(MRJob):
             in_bytes += i
             out_bytes += o
 
-        yield key, "\t".join((key, str(accessed), str(blocked), str(in_bytes), str(out_bytes)))
+        yield key, "\t".join(chain(key, imap(str, (accessed, blocked, in_bytes, out_bytes))))
 
 
 if __name__ == '__main__':
