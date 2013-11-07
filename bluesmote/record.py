@@ -1,9 +1,5 @@
 from functools import wraps
-
-try:
-    from collections import namedtuple
-except ImportError:
-    from bluesmote.compat import namedtuple
+from collections import namedtuple
 
 Record = namedtuple("Record",
 ["filename",
