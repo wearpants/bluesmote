@@ -10,6 +10,7 @@ ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 
 class AllThings(MRJob):
 
+    INTERNAL_PROTOCOL = PickleProtocol
     OUTPUT_PROTOCOL = RawValueProtocol
 
     # output: tab separated
@@ -28,15 +29,21 @@ class AllThings(MRJob):
 
     def combiner(self, key, value):
         accessed = blocked = in_bytes = out_bytes = 0
-        for r, i, o in value:
-            in_bytes += i
-            out_bytes += o
-            if r in ("OBSERVED", "PROXIED"):
-                accessed += 1
-            elif r == "DENIED":
-                blocked += 1
+        for _ in value:
+            try:
+                r, i, o = _
+            except ValueError:
+                self.increment_counter("combiner_value_error", _)
             else:
-                self.increment_counter("unknown_sc_filter_result", r)
+                in_bytes += i
+                out_bytes += o
+                if r in ("OBSERVED", "PROXIED"):
+                    accessed += 1
+                elif r == "DENIED":
+                    blocked += 1
+                else:
+                    self.increment_counter("unknown_sc_filter_result", r)
+
         yield key, (accessed, blocked, in_bytes, out_bytes)
 
     def reducer(self, key, value):
