@@ -21,7 +21,7 @@ class AllThings(MRJob):
     @Record.wrap
     def mapper(self, _, r):
         isodate = "%sT%s:00:00Z"%(r.date, r.time[:-6])
-        value = (r.sc_filter_result, int(r.sc_bytes), int(r.cs_bytes))
+        value = (str(r.sc_filter_result), int(r.sc_bytes), int(r.cs_bytes))
 
         if ip_re.match(r.cs_host):
             yield (isodate, r.cs_host), value
