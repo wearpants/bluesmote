@@ -29,12 +29,13 @@ class AllThings(MRJob):
             yield (isodate, ".".join(r.cs_host.rsplit('.', 2)[-2:])), value
 
     def combiner(self, key, value):
-        accessed = blocked = in_bytes = out_bytes = 0
+        accessed = blocked = other = error = in_bytes = out_bytes = 0
         for _ in value:
             try:
                 r, i, o = _
             except ValueError:
                 self.increment_counter("combiner_value_error", _)
+                error += 1
             else:
                 in_bytes += i
                 out_bytes += o
@@ -43,19 +44,23 @@ class AllThings(MRJob):
                 elif r == "DENIED":
                     blocked += 1
                 else:
+                    other += 1
                     self.increment_counter("unknown_sc_filter_result", r)
 
-        yield key, (accessed, blocked, in_bytes, out_bytes)
+        assert accessed + blocked + other + error > 0, "WTF %r ==> %r"%(key, value)
+        yield key, (accessed, blocked, other, error, in_bytes, out_bytes)
 
     def reducer(self, key, value):
-        accessed = blocked = in_bytes = out_bytes = 0
-        for a, b, i, o in value:
+        accessed = blocked = other = error = in_bytes = out_bytes = 0
+        for a, b, x, e, i, o in value:
             accessed += a
             blocked += b
+            other += x
+            error += e
             in_bytes += i
             out_bytes += o
 
-        yield key, "\t".join(chain(key, imap(str, (accessed, blocked, in_bytes, out_bytes))))
+        yield key, "\t".join(chain(key, imap(str, (accessed, blocked, other, error, in_bytes, out_bytes))))
 
 
 if __name__ == '__main__':
