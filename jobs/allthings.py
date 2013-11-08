@@ -34,7 +34,7 @@ class AllThings(MRJob):
             try:
                 r, i, o = _
             except ValueError:
-                self.increment_counter("combiner_value_error", _)
+                self.increment_counter("combiner_value_error", "XXX"+repr(_)+"XXX")
                 error += 1
             else:
                 in_bytes += i
