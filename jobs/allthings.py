@@ -20,11 +20,12 @@ class AllThings(MRJob):
 
     @Record.wrap
     def mapper(self, _, r):
-        accessed = blocked = 0
         if r.sc_filter_result in ("OBSERVED", "PROXIED"):
-            accessed += 1
+            accessed = 1
+            blocked = 0
         elif r.sc_filter_result == "DENIED":
-            blocked += 1
+            accessed = 0
+            blocked = 1
         else:
             self.increment_counter("unknown_sc_filter_result", r.sc_filter_result)
 
