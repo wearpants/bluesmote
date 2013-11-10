@@ -5,7 +5,7 @@ from mrjob.job import MRJob
 from mrjob.protocol import RawValueProtocol, PickleProtocol
 from bluesmote.record import Record
 import re
-from itertools import imap, chain, izip
+from itertools import imap, chain, izip_longest
 
 ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 
@@ -37,11 +37,11 @@ class AllThings(MRJob):
         else:
             yield (isodate, ".".join(r.cs_host.rsplit('.', 2)[-2:])), values
 
-    def combiner2(self, key, values):
-        yield key, list(imap(sum, izip(*values)))
+    def combiner(self, key, values):
+        yield key, list(imap(sum, izip_longest(*values)))
 
     def reducer(self, key, values):
-        arr = imap(sum, izip(*values))
+        arr = imap(sum, izip_longest(*values))
         yield key, "\t".join(chain(key, imap(str, arr)))
 
 

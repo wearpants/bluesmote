@@ -2,44 +2,46 @@
 """playing around w/ MRJob"""
 
 from mrjob.job import MRJob
-from bluesmote.record import Record
 from mrjob.protocol import RawValueProtocol, PickleProtocol
+from bluesmote.record import Record
 import re
-from itertools import imap, chain
-from collections import defaultdict
+from itertools import imap, chain, izip_longest
 
 ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 
-class DomainRate(MRJob):
+class DomainRateAlt(MRJob):
 
     INTERNAL_PROTOCOL = PickleProtocol
     OUTPUT_PROTOCOL = RawValueProtocol
 
+    # output: tab separated
+    # key domain.com isodate
+    # fields: accessed blocked in_bytes out_bytes
+
     @Record.wrap
     def mapper(self, _, r):
-        yield "<TOTAL>",r.sc_filter_result
-        if ip_re.match(r.cs_host):
-            yield r.cs_host, r.sc_filter_result
-            yield "<IP>", r.sc_filter_result
+        if r.sc_filter_result in ("OBSERVED", "PROXIED"):
+            accessed = 1
+            blocked = 0
+        elif r.sc_filter_result == "DENIED":
+            accessed = 0
+            blocked = 1
         else:
-            yield ".".join(r.cs_host.rsplit('.', 2)[-2:]), r.sc_filter_result
-            yield "<HOST>", r.sc_filter_result
+            self.increment_counter("unknown_sc_filter_result", r.sc_filter_result)
 
-    def combiner(self, domain, result):
-        d = defaultdict(int)
-        for r in result:
-            d['TOTAL'] +=1
-            d[r] += 1
-        yield domain, d
+        values = (accessed, blocked, int(r.sc_bytes), int(r.cs_bytes))
+        if ip_re.match(r.cs_host):
+            yield r.cs_host, values
+        else:
+            yield ".".join(r.cs_host.rsplit('.', 2)[-2:]), values
 
-    def reducer(self, domain, counts):
-        d = defaultdict(int)
+    def combiner(self, key, values):
+        yield key, list(imap(sum, izip_longest(*values)))
 
-        for c in counts:
-            for k, v in c.iteritems():
-                d[k]+=v
+    def reducer(self, key, values):
+        arr = imap(sum, izip_longest(*values))
+        yield key, "\t".join(chain((key,), imap(str, arr)))
 
-        yield domain, "\t".join(chain([domain], ("%s\t%d"%i for i in sorted(d.iteritems()))))
 
 if __name__ == '__main__':
-    DomainRate.run()
+    DomainRateAlt.run()
