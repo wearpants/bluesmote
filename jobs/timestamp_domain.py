@@ -9,7 +9,7 @@ from itertools import imap, chain
 
 ip_re = re.compile(r"""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$""")
 
-class AllThings(MRJob):
+class TimestampDomain(MRJob):
 
     INTERNAL_PROTOCOL = PickleProtocol
     OUTPUT_PROTOCOL = RawValueProtocol
@@ -64,4 +64,4 @@ class AllThings(MRJob):
 
 
 if __name__ == '__main__':
-    AllThings.run()
+    TimestampDomain.run()
