@@ -8,14 +8,15 @@ text {
 
 </style>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
 var diameter = 960,
-    format = d3.format("%"),
-    color = d3.scale.linear().domain([-1, 0, 1]).range(["red", "white", "green"]);
+    format = d3.format(".5p"),
+    color = d3.scale.linear().domain([1, 0.001]).range(["red", "blue"]);
 
 var bubble = d3.layout.pack()
+    .value( function(d) { return d.count; }) 
     .sort(null)
     .size([diameter, diameter])
     .padding(1.5);
@@ -27,22 +28,25 @@ var svg = d3.select("body").append("svg")
 
 d3.json("./json/topsites.json", function(error, root) {
   var node = svg.selectAll(".node")
-      .data(bubble.nodes(root))
-      //.radius(function(d) { return d.count; })
-    .enter().append("g")
+      .data(bubble.nodes(root)
+      .filter(function(d) { return !d.children; }));
+  
+  node = node.enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   node.append("title")
-      .text(function(d) { console.log(d); return d.domain + ": " + format(d.rate); });
+      .text(function(d) { return d.domain + ": " + format(d.rate); });
 
   node.append("circle")
       .attr("r", function(d) { return d.r; })
       .style("fill", function(d) { return color(d.rate); });
 
   node.append("text")
-      .attr("dy", ".3em")
+      .attr("dy", "1em")
       .style("text-anchor", "middle")
+      .style("font-size", "1em")
+      .style("fill", "black")
       .text(function(d) { return d.domain; });
 });
 
