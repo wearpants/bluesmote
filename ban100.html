@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<title>Banned Sites | Bluesmote</title>
+
+<style>
+
+text {
+  font: 15px sans-serif;
+}
+
+</style>
+</head>
+<body>
+<H1>Top sites</H1>
+<p>Size is proportional to # of requests; redder sites had a higher block rate</p>
+<p><em>apologies if you are colorblind</em></p>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+
+var diameter = 960,
+    format = d3.format(",d"),
+    color = d3.scale.pow().domain([1, 0.9]).range(["red", "blue"]);
+
+var bubble = d3.layout.pack()
+    .value( function(d) { return d.count; }) 
+    .sort(null)
+    .size([diameter, diameter])
+    .padding(1.5);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", diameter)
+    .attr("height", diameter)
+    .attr("class", "bubble");
+
+d3.json("./json/ban100.json", function(error, root) {
+  var node = svg.selectAll(".node")
+      .data(bubble.nodes(root)
+      .filter(function(d) { return !d.children; }));
+  
+  node = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  node.append("title")
+      .text(function(d) { return d.domain + ": " + format(d.count); });
+
+  node.append("circle")
+      .attr("r", function(d) { return d.r; })
+      .style("fill", function(d) { return color(d.rate); });
+      
+      
+  node.append("text")
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      //.style("font-size", "1em")
+      .style("fill", "black")
+      .text(function(d) { return d.domain.substring(0, d.r / 3 > 5 ? d.r / 3 : 0); });
+});
+
+d3.select(self.frameElement).style("height", diameter + "px");
+
+</script>
+</body>
