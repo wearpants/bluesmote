@@ -12,15 +12,15 @@ text {
 </style>
 </head>
 <body>
-<H1>Banned sites</H1>
-<p>Blocked 100% of the time. Size is proportional to # of requests</p>
+<H1>Top sites</H1>
+<p>Size is proportional to # of requests; redder sites had a higher block rate</p>
 <p><em>apologies if you are colorblind</em></p>
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
 var diameter = 960,
     format = d3.format(",d"),
-    color = d3.scale.pow().domain([1, 0.9]).range(["white", "grey"]);
+    color = d3.scale.pow().domain([1, 0.9]).range(["red", "blue"]);
 
 var bubble = d3.layout.pack()
     .value( function(d) { return d.count; }) 
@@ -33,7 +33,7 @@ var svg = d3.select("body").append("svg")
     .attr("height", diameter)
     .attr("class", "bubble");
 
-d3.json("./json/ban100b.json", function(error, root) {
+d3.json("./json/ban1k.json", function(error, root) {
   var node = svg.selectAll(".node")
       .data(bubble.nodes(root)
       .filter(function(d) { return !d.children; }));
