@@ -20,7 +20,7 @@ fields = {
 
 
 def build_dict():
-    result = {"%s/%s"%(k, v): 0 for k, L in fields.iteritems() for v in L }
+    result = dict(("%s/%s"%(k, v), 0) for k, L in fields.iteritems() for v in L)
 
     result['sc_bytes'] = 0
     result['cs_bytes'] = 0
