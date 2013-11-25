@@ -14,7 +14,8 @@ fields = {
      'sc_filter_result': set(['OBSERVED', 'DENIED', 'PROXIED']),
      'sc_status': set(['200', '304', '206', '503', '403', '302', '0', '204', '404', '400', '500', '301', '410', '401', '406', '504', '412', '416', '501', '303', '502', '408', '307', '405', '100', '202', '201', '761', '999', '509', '300']),
      's_action': set(['TCP_NC_MISS', 'TCP_HIT', 'TCP_MISS', 'TCP_ERR_MISS', 'TCP_CLIENT_REFRESH', 'TCP_DENIED', 'TCP_REFRESH_MISS', 'TCP_PARTIAL_MISS', 'TCP_TUNNELED', 'TCP_NC_MISS_RST', '-', 'TCP_AUTH_HIT', 'TCP_AUTH_MISS', 'TCP_POLICY_REDIRECT', 'TCP_MISS_RST']),
-     'cs_uri_scheme': set(['http', '-', 'tcp', 'ftp', 'rtsp'])
+     'cs_uri_scheme': set(['http', '-', 'tcp', 'ftp', 'rtsp']),
+     'proxy_id': set(['42', '43', '44', '45', '46', '47', '48']),
      }
 
 
@@ -46,6 +47,9 @@ class Rollup(MRJob):
 
         for k, L in fields.iteritems():
             x = getattr(r, k)
+            if callable(x):
+                # handle proxy_id
+                x = x()
             if x in L:
                 result['%s/%s'%(k, x)] += 1
             else:

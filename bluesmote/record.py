@@ -41,6 +41,11 @@ def parse(s):
 
 Record.parse = parse
 
+def proxy_id(s):
+    return s.filename[10:12]
+
+Record.proxy_id= proxy_id
+
 @staticmethod
 def wrap(f):
     @wraps(f)
