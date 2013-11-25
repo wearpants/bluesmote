@@ -25,11 +25,11 @@ def build_dict():
 
     result['sc_bytes'] = 0
     result['cs_bytes'] = 0
+    result['requests'] = 0
     return result
 
 def headers():
-    return "\t".join(chain(('timestamp', 'domain'), sorted(build_dict().iterkeys())))
-
+    return list(chain(('timestamp', 'domain'), sorted(build_dict().iterkeys())))
 
 class Rollup(MRJob):
 
@@ -51,8 +51,9 @@ class Rollup(MRJob):
             else:
                 result['%s/RARE'%k] += 1
 
-        result['sc_bytes'] = int(r.sc_bytes)
-        result['cs_bytes'] = int(r.cs_bytes)
+        result['requests'] += 1
+        result['sc_bytes'] += int(r.sc_bytes)
+        result['cs_bytes'] += int(r.cs_bytes)
 
         values = [v for k, v in sorted(result.iteritems())]
 
