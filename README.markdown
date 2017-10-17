@@ -1,8 +1,6 @@
 # Bluesmote
 Analysis tools and scripts for Blue Coat cenorship data from Syria. [Read more](http://bluesmote.com).
 
-Originally written as part of [EU Hack for Transparancy](http://euhackathon.eu)
-
 Data available on S3:
 
 * raw data - s3://project-bluesmote/raw_logs/
@@ -15,3 +13,5 @@ Data available on S3:
 * twitter: @wearpants
 * website: http://bluesmote.com
 * source: http://github.com/wearpants/bluesmote/
+
+These tools originally written during the 2011 [EU Hackathon](http://2011.euhackathon.eu/)
